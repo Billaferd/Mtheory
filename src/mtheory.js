@@ -4,14 +4,26 @@
     var mtheory = {};
 
     function gcd(a, b) {
-        if (a < 0) { a = -a; }
-        if (b < 0) { b = -b; }
-        if (b > a) { var temp = a; a = b; b = temp; }
+        if (a < 0) {
+            a = -a;
+        }
+        if (b < 0) {
+            b = -b;
+        }
+        if (b > a) {
+            var temp = a;
+            a = b;
+            b = temp;
+        }
         while (true) {
             a %= b;
-            if (a === 0) { return b; }
+            if (a === 0) {
+                return b;
+            }
             b %= a;
-            if (b === 0) { return a; }
+            if (b === 0) {
+                return a;
+            }
         }
     }
 
@@ -20,7 +32,8 @@
     }
 
     function fromDecimal(x0) {
-        var eps = 1.0E-15, h, h1, h2, k, k1, k2, a, x;
+        var eps = 1.0E-15,
+            h, h1, h2, k, k1, k2, a, x;
 
         x = x0;
         a = Math.floor(x);
@@ -84,9 +97,15 @@
     mtheory.MTheoryInterval = MTheoryInterval;
 
     if (typeof exports !== 'undefined') {
-        if (typeof module !== 'undefined' && module.exports) { exports = module.exports = mtheory; }
+        if (typeof module !== 'undefined' && module.exports) {
+            exports = module.exports = mtheory;
+        }
 
         exports.mtheory = mtheory;
-    } else if (typeof this !== 'undefined') { this.mtheory = mtheory; } else if (typeof window !== 'undefined') { window.mtheory = mtheory; }
+    } else if (typeof this !== 'undefined') {
+        this.mtheory = mtheory;
+    } else if (typeof window !== 'undefined') {
+        window.mtheory = mtheory;
+    }
 
 }());
