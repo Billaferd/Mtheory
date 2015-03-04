@@ -32,7 +32,7 @@
     }
 
     function fromDecimal(x0) {
-        var eps = 1.0E-15,
+        var eps = 1.0E-17,
             h, h1, h2, k, k1, k2, a, x;
 
         x = x0;
@@ -54,6 +54,16 @@
         }
 
         return new MTheoryInterval(h, k);
+    }
+
+    mtheory.util = {}
+
+    mtheory.util.gcd = function (a, b) {
+        return gcd(a, b);
+    }
+
+    mtheory.scale = function (interval, tones) {
+        return new MTheoryScale(interval, tones);
     }
 
     mtheory.interval = function (numerator, denominator) {
@@ -90,22 +100,52 @@
         },
 
         toCents: function () {
-            return 1200 * (Math.abs(Math.log2(this.numerator / this.denominator)));
+            return Math.round(1200 * (Math.abs(Math.log2(this.numerator / this.denominator))), 5);
+        },
+
+        mul: function (interval) {
+            var numerator = this.numerator * interval.numerator;
+            var denominator = this.denominator * interval.denominator;
+            return mtheory.interval(numerator, denominator);
         }
     };
 
     mtheory.MTheoryInterval = MTheoryInterval;
 
+    function MTheoryScale(interval, tones) {
+        this.octaves = 1;
+        this.ratios = new Array();
+        var currRatio = 1;
+
+        this.ratios.push(mtheory.interval.fromDecimal(1));
+
+        while (this.ratios.length < tones && currRatio != 2) {
+            currRatio = currRatio * interval.toDecimal();
+            if (currRatio > 2) {
+                currRatio = currRatio / 2;
+                this.octaves++;
+            }
+
+            this.ratios.push(mtheory.interval.fromDecimal(currRatio));
+        }
+
+        this.ratios.push(mtheory.interval.fromDecimal(2));
+
+        this.ratios.sort(function (a, b) {
+            return a.toDecimal() - b.toDecimal();
+        });
+    }
+
+    mtheory.MTheoryScale = MTheoryScale;
+
     if (typeof exports !== 'undefined') {
         if (typeof module !== 'undefined' && module.exports) {
             exports = module.exports = mtheory;
         }
-
         exports.mtheory = mtheory;
     } else if (typeof this !== 'undefined') {
         this.mtheory = mtheory;
     } else if (typeof window !== 'undefined') {
         window.mtheory = mtheory;
     }
-
 }());
