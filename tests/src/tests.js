@@ -104,7 +104,15 @@ pavlov.specify("Mtheory Cover Tests", function () {
                 scale.ratios.forEach(function (element, index, array) {
                     assert(element.toCents()).equals(index * 100);
                 });
-            })
+            });
+
+            it("Should have 13 intervals that are 100 cents apart.", function (interval, tones) {
+                var scale = mtheory.scale(mtheory.interval.fromCents(700), 12);
+
+                scale.intervals.forEach(function (element, index, array) {
+                    assert(element.toCents()).equals(index * 100);
+                });
+            });
         });
 
         describe("MtheoryUtil", function () {
@@ -113,6 +121,27 @@ pavlov.specify("Mtheory Cover Tests", function () {
                 var c = mtheory.util.gcd(a, b);
 
                 assert(c).equals(a);
+            });
+
+            given([5, 15], [20, 25]).
+            it("Should return the least common multiple.", function (a, b) {
+                var c = mtheory.util.lcm(a, b);
+
+                assert(c).equals(5);
+            });
+
+            given([2, 1], [1, 2]).
+            it("Should return the least common multiple.", function (a, b) {
+                var c = mtheory.util.lcm(a, b);
+
+                assert(c).equals(1);
+            });
+
+            given([2, 6], [6, 2]).
+            it("Should return the least common multiple.", function (a, b) {
+                var c = mtheory.util.lcm(a, b);
+
+                assert(c).equals(2);
             });
         });
     });

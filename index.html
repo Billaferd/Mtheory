@@ -16,8 +16,8 @@
         console.log(interval.toDecimal());
         console.log(interval.toCents());
         var scale = mtheory.scale(interval, 12);
-        scale.ratios.forEach(function (element, index, array) {
-            console.log('a[' + index + '] = ' + element.toCents());
+        scale.intervals.forEach(function (element, index, array) {
+            console.log('a[' + index + '] = ' + element + ' ==> ' + element.toDecimal() + ' ==> ' + element.toCents());
         });
     </script>
 </body>

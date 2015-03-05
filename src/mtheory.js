@@ -3,6 +3,42 @@
 
     var mtheory = {};
 
+    function unique(arr) {
+        var a = [],
+            l = arr.length;
+        for (var i = 0; i < l; i++) {
+            for (var j = i + 1; j < l; j++)
+                if (arr[i].toCents() === arr[j].toCents()) j = ++i;
+            a.push(arr[i]);
+        }
+        return a;
+    }
+
+    // Taken from http://www.javascriptsource.com/math-related/gcd-lcm-calculator.html
+    // Will be re-written for readability.
+    function lcm(a, b) {
+        var gcd = 1;
+        if (a > b) {
+            a = a + b;
+            b = a - b;
+            a = a - b;
+        }
+        if ((b == (Math.round(b / a)) * a)) {
+            gcd = a
+        } else {
+            for (var i = Math.round(a / 2); i > 1; i = i - 1) {
+                if ((a == (Math.round(a / i)) * i))
+                    if ((b == (Math.round(b / i)) * i)) {
+                        gcd = i;
+                        i = -1;
+                    }
+            }
+        }
+        return gcd;
+    }
+
+    // Taken from http://rosettacode.org/wiki/Greatest_common_divisor#JavaScript
+    // Will be re-written for readability
     function gcd(a, b) {
         if (a < 0) {
             a = -a;
@@ -31,8 +67,16 @@
         return fromDecimal(Math.pow(2, cents / 1200));
     }
 
+    // Taken from https://stackoverflow.com/questions/14002113/how-to-get-lowest-possible-fraction-for-a-decimal
+    // Will be re-written for readability.
     function fromDecimal(x0) {
-        var eps = 1.0E-17,
+        //TODO: Adjust epsilon based on number of decimal places in a number.
+        // E-17 is a nice medium but can cause wierdness with some numbers. Should adjust itself for maximum accuracy / precision.
+        // epsilon should have rules base^(-k) where k is the total number of digits in the pattern after the decimal
+        //  OR total number of digits after the decimal if a pattern is not detected.
+        // ex. 1.123123123 would give an epsilon of 3.
+        // ex. 1.123124125 would give an epsilon of 9.
+        var eps = 1.0E-13,
             h, h1, h2, k, k1, k2, a, x;
 
         x = x0;
@@ -60,6 +104,10 @@
 
     mtheory.util.gcd = function (a, b) {
         return gcd(a, b);
+    }
+
+    mtheory.util.lcm = function (a, b) {
+        return lcm(a, b);
     }
 
     mtheory.scale = function (interval, tones) {
@@ -116,7 +164,7 @@
         },
 
         inverse: function () {
-            return fromCents(1200 - this.toCents());
+            return mtheory.interval.fromDecimal(2).divide(this);
         }
     };
 
@@ -125,23 +173,51 @@
     function MTheoryScale(interval, tones) {
         this.octaves = 1;
         this.ratios = new Array();
+        this.intervals = new Array();
+
         var currRatio = 1;
 
         this.ratios.push(mtheory.interval.fromDecimal(1));
 
         while (this.ratios.length < tones && currRatio != 2) {
             currRatio = currRatio * interval.toDecimal();
-            if (currRatio > 2) {
-                currRatio = currRatio / 2;
-                this.octaves++;
-            }
 
-            this.ratios.push(mtheory.interval.fromDecimal(currRatio));
+            var div = parseInt(currRatio);
+            this.octaves += div - 1;
+            currRatio /= div;
+
+            var rat = mtheory.interval.fromDecimal(currRatio);
+
+            this.ratios.push(rat);
+
+            var tempRatios = new Array();
+
+            this.ratios.forEach(function (element, index, array) {
+                tempRatios.push(rat.divide(element));
+            });
+
+            this.intervals = this.intervals.concat(tempRatios);
+
+            this.intervals = unique(this.intervals);
         }
 
-        this.ratios.push(mtheory.interval.fromDecimal(2));
+        var oct = mtheory.interval.fromDecimal(2);
+
+        this.ratios.push(oct);
+
+        this.ratios.forEach(function (element, index, array) {
+            tempRatios.push(oct.divide(element));
+        });
+
+        this.intervals = this.intervals.concat(tempRatios);
 
         this.ratios.sort(function (a, b) {
+            return a.toDecimal() - b.toDecimal();
+        });
+
+        this.intervals = unique(this.intervals);
+
+        this.intervals.sort(function (a, b) {
             return a.toDecimal() - b.toDecimal();
         });
     }
