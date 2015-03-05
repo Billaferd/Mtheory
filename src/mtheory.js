@@ -100,13 +100,23 @@
         },
 
         toCents: function () {
-            return Math.round(1200 * (Math.abs(Math.log2(this.numerator / this.denominator))), 5);
+            return +(Math.round(1200 * (Math.abs(Math.log2(this.numerator / this.denominator))) + "e+5") + "e-5");
         },
 
-        mul: function (interval) {
+        multiply: function (interval) {
             var numerator = this.numerator * interval.numerator;
             var denominator = this.denominator * interval.denominator;
             return mtheory.interval(numerator, denominator);
+        },
+
+        divide: function (interval) {
+            var numerator = this.numerator * interval.denominator;
+            var denominator = this.denominator * interval.numerator;
+            return mtheory.interval(numerator, denominator);
+        },
+
+        inverse: function () {
+            return fromCents(1200 - this.toCents());
         }
     };
 

@@ -60,10 +60,28 @@ pavlov.specify("Mtheory Cover Tests", function () {
                 var interval = mtheory.interval(n1, d1);
                 var interval2 = mtheory.interval(n2, d2);
 
-                var interval3 = interval.mul(interval2);
+                var interval3 = interval.multiply(interval2);
 
                 assert(interval3.numerator).equals(n1 * n2);
                 assert(interval3.denominator).equals(d1 * d2);
+            });
+
+            given([1, 1, 2, 1], [1, 3, 1, 2], [1, 7, 2, 1]).
+            it("Should return a proper numerator and denominator after division.", function (n1, d1, n2, d2) {
+                var interval = mtheory.interval(n1, d1);
+                var interval2 = mtheory.interval(n2, d2);
+
+                var interval3 = interval.divide(interval2);
+
+                assert(interval3.numerator).equals(n1 * d2);
+                assert(interval3.denominator).equals(d1 * n2);
+            });
+
+            given(100, 500, 700, 600).
+            it("Should give the musical inverse of the interval.", function (cents) {
+                var interval = mtheory.interval.fromCents(cents);
+                var interval2 = interval.inverse();
+                assert(interval2.toCents()).equals(1200 - cents);
             });
         });
 
